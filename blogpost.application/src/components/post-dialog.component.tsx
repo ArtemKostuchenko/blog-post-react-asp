@@ -103,6 +103,8 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       if (!edit) {
         reset();
       }
+
+      setPreview(null);
     }
   }, [mutateStatus, edit]);
 
@@ -241,7 +243,7 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
               <Input
                 type="file"
                 ref={inputRef}
-                accept="image/png, image/jpeg"
+                accept="image/png, image/jpeg, image/webp"
                 onChange={handleFileChange}
                 hidden
               />
