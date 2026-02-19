@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="BlogPost.Application/blogpost.application.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="TestWebApi/BlogPost.Api.csproj" />
+</Solution>
