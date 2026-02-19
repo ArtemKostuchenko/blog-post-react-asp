@@ -6,4 +6,4 @@
 - React + Vite (redux & redux-observable, react router)
 - SQl Server, EF
 
-[Web preview](blog-post.audentes-fortuna-juvat.cc)
+[Web preview](https://blog-post.audentes-fortuna-juvat.cc)
