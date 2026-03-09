@@ -21,7 +21,7 @@ import {
 import { postSchema, type PostFormData } from "@/utils/validations/post";
 import { Textarea } from "./ui/textarea";
 import useAuth from "@/hooks/auth";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ImagePlus, Trash2Icon } from "lucide-react";
 import { AspectRatio } from "./ui/aspect-ratio";
 import {
@@ -104,15 +104,26 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
 
   const preview = imagePreviewUrl ?? derivedPreview;
 
+  const resetImagePreview = useCallback(() => {
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+    setImagePreviewUrl(null);
+  }, []);
+
   useEffect(() => {
     if (mutateStatus === "success") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      resetImagePreview();
+
       closeModal();
 
       if (!edit) {
         reset();
       }
     }
-  }, [mutateStatus, edit, closeModal, reset]);
+  }, [mutateStatus, edit, closeModal, reset, resetImagePreview]);
 
   const onSubmit = (postData: PostFormData) => {
     if (isLoading) {
@@ -167,12 +178,7 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       return;
     }
 
-    if (blobUrlRef.current) {
-      URL.revokeObjectURL(blobUrlRef.current);
-      blobUrlRef.current = null;
-    }
-
-    setImagePreviewUrl(null);
+    resetImagePreview();
     setValue("image", undefined);
   };
 
