@@ -94,16 +94,19 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
   const [preview, setPreview] = useState<string | null>(derivedPreview);
 
   useEffect(() => {
-    if (!image) {
-      setPreview(derivedPreview);
-      return;
-    }
+    if (!image) return;
 
     const objectUrl = URL.createObjectURL(image);
     setPreview(objectUrl);
 
     return () => URL.revokeObjectURL(objectUrl);
-  }, [image, derivedPreview]);
+  }, [image]);
+
+  useEffect(() => {
+    if (!image) {
+      setPreview(derivedPreview);
+    }
+  }, [derivedPreview, image]);
 
   useEffect(() => {
     if (mutateStatus === "success") {
