@@ -53,7 +53,7 @@ const RegisterDialog = () => {
     if (isInitialized && isAuthenticated) {
       closeModal();
     }
-  }, [isAuthenticated, isInitialized]);
+  }, [isInitialized, isAuthenticated, closeModal]);
 
   const onSubmit = (data: RegisterFormData) => registerUser(data);
 

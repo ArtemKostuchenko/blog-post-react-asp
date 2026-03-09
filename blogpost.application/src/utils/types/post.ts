@@ -11,7 +11,7 @@ export interface Post {
   image?: Image;
 }
 
-export interface PostQueryParams extends DefaultQueryParams {}
+export type PostQueryParams = DefaultQueryParams;
 
 export interface PostDto {
   id: string;
