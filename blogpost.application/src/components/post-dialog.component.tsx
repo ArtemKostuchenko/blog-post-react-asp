@@ -21,7 +21,7 @@ import {
 import { postSchema, type PostFormData } from "@/utils/validations/post";
 import { Textarea } from "./ui/textarea";
 import useAuth from "@/hooks/auth";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImagePlus, Trash2Icon } from "lucide-react";
 import { AspectRatio } from "./ui/aspect-ratio";
 import {
@@ -91,12 +91,18 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
   }, [data, setValue]);
 
   const derivedPreview = data?.image ? getResourceUrl(data.image.url) : null;
-  const preview = useMemo(() => {
-    if (image) {
-      return URL.createObjectURL(image);
+  const [preview, setPreview] = useState<string | null>(derivedPreview);
+
+  useEffect(() => {
+    if (!image) {
+      setPreview(derivedPreview);
+      return;
     }
 
-    return derivedPreview;
+    const objectUrl = URL.createObjectURL(image);
+    setPreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
   }, [image, derivedPreview]);
 
   useEffect(() => {
@@ -108,14 +114,6 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       }
     }
   }, [mutateStatus, edit, closeModal, reset]);
-
-  useEffect(() => {
-    if (!image) return;
-
-    const objectUrl = URL.createObjectURL(image);
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [image]);
 
   const onSubmit = (postData: PostFormData) => {
     if (isLoading) {
