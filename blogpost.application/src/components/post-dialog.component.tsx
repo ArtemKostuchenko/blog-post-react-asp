@@ -91,22 +91,18 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
   }, [data, setValue]);
 
   const derivedPreview = data?.image ? getResourceUrl(data.image.url) : null;
-  const [preview, setPreview] = useState<string | null>(derivedPreview);
+  const blobUrlRef = useRef<string | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!image) return;
+    return () => {
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+      }
+    };
+  }, []);
 
-    const objectUrl = URL.createObjectURL(image);
-    setPreview(objectUrl);
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [image]);
-
-  useEffect(() => {
-    if (!image) {
-      setPreview(derivedPreview);
-    }
-  }, [derivedPreview, image]);
+  const preview = imagePreviewUrl ?? derivedPreview;
 
   useEffect(() => {
     if (mutateStatus === "success") {
