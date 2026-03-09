@@ -91,19 +91,22 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
   }, [data, setValue]);
 
   const derivedPreview = data?.image ? getResourceUrl(data.image.url) : null;
-  const blobUrlRef = useRef<string | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(derivedPreview);
 
-  // Revoke blob URL on unmount only
   useEffect(() => {
-    return () => {
-      if (blobUrlRef.current) {
-        URL.revokeObjectURL(blobUrlRef.current);
-      }
-    };
-  }, []);
+    if (!image) return;
 
-  const preview = imagePreviewUrl ?? derivedPreview;
+    const objectUrl = URL.createObjectURL(image);
+    setPreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [image]);
+
+  useEffect(() => {
+    if (!image) {
+      setPreview(derivedPreview);
+    }
+  }, [derivedPreview, image]);
 
   useEffect(() => {
     if (mutateStatus === "success") {
