@@ -21,7 +21,7 @@ import {
 import { postSchema, type PostFormData } from "@/utils/validations/post";
 import { Textarea } from "./ui/textarea";
 import useAuth from "@/hooks/auth";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImagePlus, Trash2Icon } from "lucide-react";
 import { AspectRatio } from "./ui/aspect-ratio";
 import {
@@ -91,13 +91,19 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
   }, [data, setValue]);
 
   const derivedPreview = data?.image ? getResourceUrl(data.image.url) : null;
-  const preview = useMemo(() => {
-    if (image) {
-      return URL.createObjectURL(image);
-    }
+  const blobUrlRef = useRef<string | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
-    return derivedPreview;
-  }, [image, derivedPreview]);
+  // Revoke blob URL on unmount only
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+      }
+    };
+  }, []);
+
+  const preview = imagePreviewUrl ?? derivedPreview;
 
   useEffect(() => {
     if (mutateStatus === "success") {
@@ -108,14 +114,6 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       }
     }
   }, [mutateStatus, edit, closeModal, reset]);
-
-  useEffect(() => {
-    if (!image) return;
-
-    const objectUrl = URL.createObjectURL(image);
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [image]);
 
   const onSubmit = (postData: PostFormData) => {
     if (isLoading) {
@@ -155,6 +153,13 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       return;
     }
 
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+    }
+
+    const url = URL.createObjectURL(file);
+    blobUrlRef.current = url;
+    setImagePreviewUrl(url);
     setValue("image", file);
   };
 
@@ -163,6 +168,12 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       return;
     }
 
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+
+    setImagePreviewUrl(null);
     setValue("image", undefined);
   };
 
