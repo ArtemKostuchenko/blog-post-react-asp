@@ -156,6 +156,13 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       return;
     }
 
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+    }
+
+    const url = URL.createObjectURL(file);
+    blobUrlRef.current = url;
+    setImagePreviewUrl(url);
     setValue("image", file);
   };
 
@@ -164,6 +171,12 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       return;
     }
 
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+
+    setImagePreviewUrl(null);
     setValue("image", undefined);
   };
 
