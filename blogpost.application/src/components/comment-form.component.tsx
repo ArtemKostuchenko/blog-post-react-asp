@@ -56,7 +56,7 @@ const CommentForm = ({
       reset();
       dispatch(commentActions.resetStatus());
     }
-  }, [mutateStatus]);
+  }, [mutateStatus, onSuccess, reset, dispatch]);
 
   const isLoading = mutateStatus === "loading";
 

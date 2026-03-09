@@ -47,7 +47,7 @@ const EditProfileSheet = () => {
       closeModal();
       dispatch(userActions.resetStatus());
     }
-  }, [mutateStatus]);
+  }, [mutateStatus, closeModal, dispatch]);
 
   const isLoading = mutateStatus === "loading";
 

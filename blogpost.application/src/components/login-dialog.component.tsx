@@ -45,7 +45,7 @@ const LoginDialog = () => {
     if (isInitialized && isAuthenticated) {
       closeModal();
     }
-  }, [isAuthenticated, isInitialized]);
+  }, [isInitialized, isAuthenticated, closeModal]);
 
   const onSubmit = (data: LoginFormData) => login(data);
 

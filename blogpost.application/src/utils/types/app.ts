@@ -18,12 +18,12 @@ export interface DataState {
 export interface Modal {
   name: string;
   opened: boolean;
-  data: any;
+  data: unknown;
 }
 
 export interface ModalPayload {
   name: string;
-  data: any;
+  data: unknown;
 }
 
 export interface ModalVisibilityPayload {

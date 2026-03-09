@@ -24,7 +24,7 @@ const CommentEditDialog = () => {
     if (!isAuthenticated) {
       closeModal();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, closeModal]);
 
   useEffect(() => {
     if (user && data) {
@@ -32,7 +32,7 @@ const CommentEditDialog = () => {
         closeModal();
       }
     }
-  }, [user, data]);
+  }, [user, data, closeModal]);
 
   if (!isAuthenticated || !data) {
     return null;

@@ -21,7 +21,7 @@ import { Clock, MailIcon, UserIcon, UserRoundPen } from "lucide-react";
 import EditProfileSheet from "@/components/edit-profile-sheet.component";
 import useModal from "@/hooks/modal";
 import { ModalType } from "@/utils/types/app";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useAppDispatch } from "@/hooks/redux";
 import { userActions } from "@/utils/store/user/user.slice";
 
@@ -29,22 +29,7 @@ const ProfilePage = () => {
   const { openModal } = useModal(ModalType.EDIT_PROFILE);
   const inputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
-  const [avatar, setAvatar] = useState<File | null>(null);
   const { user, mutateStatus } = useUser();
-
-  useEffect(() => {
-    if (!avatar) {
-      return;
-    }
-
-    dispatch(
-      userActions.updateUserAvatar({
-        avatar,
-      }),
-    );
-
-    setAvatar(null);
-  }, [avatar]);
 
   const handleEditProfileSheet = () => openModal();
 
@@ -59,7 +44,11 @@ const ProfilePage = () => {
       return;
     }
 
-    setAvatar(file);
+    dispatch(
+      userActions.updateUserAvatar({
+        avatar: file,
+      }),
+    );
   };
 
   const handleSelectImage = () => {

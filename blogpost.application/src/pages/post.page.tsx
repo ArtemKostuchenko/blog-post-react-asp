@@ -36,7 +36,7 @@ const PostPage = () => {
     if (!isPostLoading && post) {
       dispatch(commentActions.fetchPostComments(post.id));
     }
-  }, [post, isPostLoading]);
+  }, [isPostLoading, post, dispatch]);
 
   if (isPostLoading) {
     return (
