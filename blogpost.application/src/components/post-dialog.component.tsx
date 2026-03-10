@@ -9,7 +9,7 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useModal from "@/hooks/modal";
 import { ModalType } from "@/utils/types/app";
@@ -21,7 +21,7 @@ import {
 import { postSchema, type PostFormData } from "@/utils/validations/post";
 import { Textarea } from "./ui/textarea";
 import useAuth from "@/hooks/auth";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ImagePlus, Trash2Icon } from "lucide-react";
 import { AspectRatio } from "./ui/aspect-ratio";
 import {
@@ -48,7 +48,6 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
     useModal<PostDto>(modalType);
   const { isAuthenticated } = useAuth();
   const { user } = useUser();
-  const [preview, setPreview] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const mutateStatus = useAppSelector(selectPostMutateStatus);
@@ -57,7 +56,7 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
   const {
     handleSubmit,
     register,
-    watch,
+    control,
     setValue,
     reset,
     formState: { errors },
@@ -65,13 +64,16 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
     resolver: zodResolver(postSchema),
   });
 
-  const image = watch("image");
+  const image = useWatch({
+    name: "image",
+    control,
+  });
 
   useEffect(() => {
     if (!isAuthenticated) {
       closeModal();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, closeModal]);
 
   useEffect(() => {
     if (user && data) {
@@ -79,47 +81,49 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
         closeModal();
       }
     }
-  }, [user, data]);
+  }, [user, data, closeModal]);
 
   useEffect(() => {
-    if (data) {
-      setValue("title", data.title);
-      setValue("content", data.content);
+    if (!data) return;
 
-      if (data.image) {
-        setPreview(getResourceUrl(data.image.url));
-      }
-    }
+    setValue("title", data.title);
+    setValue("content", data.content);
+  }, [data, setValue]);
 
+  const derivedPreview = data?.image ? getResourceUrl(data.image.url) : null;
+  const blobUrlRef = useRef<string | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
     return () => {
-      setPreview(null);
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+      }
     };
-  }, [data]);
+  }, []);
+
+  const preview = imagePreviewUrl ?? derivedPreview;
+
+  const resetImagePreview = useCallback(() => {
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+    setImagePreviewUrl(null);
+  }, []);
 
   useEffect(() => {
     if (mutateStatus === "success") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      resetImagePreview();
+
       closeModal();
 
       if (!edit) {
         reset();
       }
-
-      setPreview(null);
     }
-  }, [mutateStatus, edit]);
-
-  useEffect(() => {
-    if (!image) {
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(image);
-    setPreview(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [image]);
+  }, [mutateStatus, edit, closeModal, reset, resetImagePreview]);
 
   const onSubmit = (postData: PostFormData) => {
     if (isLoading) {
@@ -159,6 +163,13 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       return;
     }
 
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+    }
+
+    const url = URL.createObjectURL(file);
+    blobUrlRef.current = url;
+    setImagePreviewUrl(url);
     setValue("image", file);
   };
 
@@ -167,12 +178,7 @@ const PostDialog = ({ edit = false }: PostDialogProps) => {
       return;
     }
 
-    if (edit && data && data.image) {
-      setPreview(getResourceUrl(data.image.url));
-    } else {
-      setPreview(null);
-    }
-
+    resetImagePreview();
     setValue("image", undefined);
   };
 

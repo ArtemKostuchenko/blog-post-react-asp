@@ -16,7 +16,7 @@ export interface CommentsDto {
   totalPages: number;
 }
 
-export interface CommentQueryParams extends DefaultQueryParams {}
+export type CommentQueryParams = DefaultQueryParams;
 
 export interface AddCommentRequestDto {
   postId: string;

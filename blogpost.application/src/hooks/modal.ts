@@ -2,7 +2,7 @@ import { useMemo, useCallback } from "react";
 import { appActions, selectModals } from "@/utils/store/app/app.slice";
 import { useAppDispatch, useAppSelector } from "./redux";
 
-const useModal = <T = any>(modalName?: string) => {
+const useModal = <T = unknown>(modalName?: string) => {
   const dispatch = useAppDispatch();
   const modals = useAppSelector(selectModals);
 
