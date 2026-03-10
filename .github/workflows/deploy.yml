@@ -1,0 +1,39 @@
+name: Deploy project
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v6
+      - name: Login GHCR
+        run: echo ${{secrets.GITHUB_TOKEN}} | docker login ghcr.io -u ${{github.actor}} --password-stdin
+      - name: Build API
+        run: |
+          docker build \
+          -t ghcr.io/${{ github.actor }}/blog-post-api:${{ github.sha }} \
+          -t ghcr.io/${{ github.actor }}/blog-post-api:latest \
+          ./TestWebApi
+      - name: Push API
+        run: |
+          docker push ghcr.io/${{ github.actor }}/blog-post-api:${{ github.sha }}
+          docker push ghcr.io/${{ github.actor }}/blog-post-api:latest
+      - name: Build Front
+        run: |
+          docker build \
+          -t ghcr.io/${{ github.actor }}/blog-post-front:${{ github.sha }} \
+          -t ghcr.io/${{ github.actor }}/blog-post-front:latest \
+          ./blogpost.application
+      - name: Push Front
+        run: |
+          docker push ghcr.io/${{ github.actor }}/blog-post-front:${{ github.sha }}
+          docker push ghcr.io/${{ github.actor }}/blog-post-front:latest
