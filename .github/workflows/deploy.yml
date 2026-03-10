@@ -21,20 +21,20 @@ jobs:
       - name: Build API
         run: |
           docker build \
-          -t ghcr.io/artemkostiuchenko/blog-post-api:${{ github.sha }} \
-          -t ghcr.io/artemkostiuchenko/blog-post-api:latest \
+          -t ghcr.io/artemkostuchenko/blog-post-api:${{ github.sha }} \
+          -t ghcr.io/artemkostuchenko/blog-post-api:latest \
           ./TestWebApi
       - name: Push API
         run: |
-          docker push ghcr.io/artemkostiuchenko/blog-post-api:${{ github.sha }}
-          docker push ghcr.io/artemkostiuchenko/blog-post-api:latest
+          docker push ghcr.io/artemkostuchenko/blog-post-api:${{ github.sha }}
+          docker push ghcr.io/artemkostuchenko/blog-post-api:latest
       - name: Build Front
         run: |
           docker build \
-          -t ghcr.io/artemkostiuchenko/blog-post-front:${{ github.sha }} \
-          -t ghcr.io/artemkostiuchenko/blog-post-front:latest \
+          -t ghcr.io/artemkostuchenko/blog-post-front:${{ github.sha }} \
+          -t ghcr.io/artemkostuchenko/blog-post-front:latest \
           ./blogpost.application
       - name: Push Front
         run: |
-          docker push ghcr.io/artemkostiuchenkoo/blog-post-front:${{ github.sha }}
-          docker push ghcr.io/artemkostiuchenko/blog-post-front:latest
+          docker push ghcr.io/artemkostuchenko/blog-post-front:${{ github.sha }}
+          docker push ghcr.io/artemkostuchenko/blog-post-front:latest
