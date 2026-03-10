@@ -1,32 +1,62 @@
 services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    restart: always
+    container_name: blog-db
+    restart: unless-stopped
     env_file:
       - db.env
+    networks:
+      - blog-network
     volumes:
       - sql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "pidof sqlservr"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   api:
     image: ghcr.io/artemkostuchenko/blog-post-api:latest
-    restart: always
+    container_name: blog-api
+    restart: unless-stopped
     env_file:
       - api.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - blog-network
     volumes:
       - static_files:/app/static
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
 
   app:
     image: ghcr.io/artemkostuchenko/blog-post-front:latest
+    container_name: blog-front
+    restart: unless-stopped
     ports:
       - "8080:80"
-    restart: always
+    networks:
+      - blog-network
+    depends_on:
+      - api
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: blog-watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 60 --cleanup
 
 volumes:
   sql_data:
   static_files:
 
 networks:
-  network:
+  blog-network:
     driver: bridge
