@@ -83,7 +83,6 @@ export const fetchApi = async <T, Q extends object = Record<string, unknown>>(
     const refreshToken = localStorage.getItem("_rt");
 
     if (!refreshToken) {
-      localStorage.removeItem("_rt");
       store.dispatch(authActions.logout());
       throw defaultApiError;
     }
