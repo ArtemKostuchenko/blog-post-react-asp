@@ -23,12 +23,14 @@ export const authRepository: IAuthRepository = {
     return await fetchApi("auth/refresh", {
       method: "POST",
       data: request,
+      retryOnFail: false,
     });
   },
   logout: async (accessToken?: string) => {
     return await fetchApi("auth/logout", {
       method: "POST",
       accessToken,
+      retryOnFail: false,
     });
   },
 };

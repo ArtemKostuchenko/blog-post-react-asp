@@ -67,7 +67,9 @@ const authRefreshEpic: AppEpic = ($action) =>
           localStorage.setItem("_rt", data.refreshToken);
           return authActions.refreshFulfilled(data);
         }),
-        catchError((err) => of(authActions.refreshRejected(err))),
+        catchError((err: ApiError) =>
+          of(authActions.refreshRejected(err.errors)),
+        ),
       ),
     ),
   );
