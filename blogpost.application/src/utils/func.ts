@@ -44,7 +44,8 @@ export const fetchApi = async <T, Q extends object = Record<string, unknown>>(
   const url = new URL(`/api/${path}`, baseApi);
 
   const { query, data, accessToken, method } = options;
-  const retryOnFail = options.retryOnFail ? options.retryOnFail : true;
+
+  const retryOnFail = options.retryOnFail ?? true;
 
   if (query) {
     Object.entries(query).forEach(([key, value]) => {
@@ -78,10 +79,13 @@ export const fetchApi = async <T, Q extends object = Record<string, unknown>>(
       status: 401,
       errors: ["Please login again"],
     };
+
     const refreshToken = localStorage.getItem("_rt");
 
     if (!refreshToken) {
-      throw defaultApiError as ApiError;
+      localStorage.removeItem("_rt");
+      store.dispatch(authActions.logout());
+      throw defaultApiError;
     }
 
     if (!refreshPromise) {
@@ -95,6 +99,7 @@ export const fetchApi = async <T, Q extends object = Record<string, unknown>>(
           return data.accessToken;
         })
         .catch(() => {
+          localStorage.removeItem("_rt");
           store.dispatch(authActions.logout());
           return null;
         })
