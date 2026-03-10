@@ -9,7 +9,7 @@ export interface ApiError {
   errors: string[];
 }
 
-export const objectToFormData = (obj: Record<string, unknown>): FormData => {
+export const objectToFormData = (obj: object): FormData => {
   const formData = new FormData();
 
   Object.entries(obj).forEach(([key, value]) => {
@@ -25,9 +25,7 @@ export const objectToFormData = (obj: Record<string, unknown>): FormData => {
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-export interface FetchApiOptions<
-  Q extends Record<string, unknown> = Record<string, unknown>,
-> {
+export interface FetchApiOptions<Q extends object = Record<string, unknown>> {
   method?: HttpMethod;
   data?: unknown;
   query?: Q;
@@ -37,10 +35,7 @@ export interface FetchApiOptions<
 
 let refreshPromise: Promise<string | null> | null = null;
 
-export const fetchApi = async <
-  T,
-  Q extends Record<string, unknown> = Record<string, unknown>,
->(
+export const fetchApi = async <T, Q extends object = Record<string, unknown>>(
   path: string,
   options: FetchApiOptions<Q> = {},
 ): Promise<T> => {
@@ -112,7 +107,7 @@ export const fetchApi = async <
 
     if (!newAccessToken) throw defaultApiError as ApiError;
 
-    return fetchApi<T>(path, {
+    return fetchApi<T, Q>(path, {
       ...options,
       accessToken: newAccessToken,
       retryOnFail: false,
