@@ -5,13 +5,12 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY ["TestWebApi/BlogPost.Api.csproj", "TestWebApi/"]
-RUN dotnet restore "./TestWebApi/BlogPost.Api.csproj"
+COPY ["BlogPost.Api.csproj", "./"]
+RUN dotnet restore "BlogPost.Api.csproj"
 
 COPY . .
 
-WORKDIR "/src/TestWebApi"
-RUN dotnet publish "./BlogPost.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "BlogPost.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 
