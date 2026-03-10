@@ -8,7 +8,7 @@ services:
       - sql_data:/var/opt/mssql
 
   api:
-    image: ghcr.io/ArtemKostuchenko/blog-post-api:latest
+    image: ghcr.io/artemkostiuchenko/blog-post-api:latest
     restart: always
     env_file:
       - api.env
@@ -18,7 +18,7 @@ services:
       - static_files:/app/static
 
   app:
-    image: ghcr.io/ArtemKostuchenko/blog-post-front:latest
+    image: ghcr.io/artemkostiuchenko/blog-post-front:latest
     ports:
       - "8080:80"
     restart: always
