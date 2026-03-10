@@ -30,6 +30,7 @@ export const authRepository: IAuthRepository = {
     return await fetchApi("auth/logout", {
       method: "POST",
       accessToken,
+      retryOnFail: false,
     });
   },
 };
