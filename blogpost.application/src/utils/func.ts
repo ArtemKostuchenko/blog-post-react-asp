@@ -107,11 +107,10 @@ export const fetchApi = async <T, Q extends object = Record<string, unknown>>(
 
     if (!newAccessToken) throw defaultApiError as ApiError;
 
-    return fetchApi<T, Record<string, unknown>>(path, {
+    return fetchApi<T, Q>(path, {
       ...options,
       accessToken: newAccessToken,
       retryOnFail: false,
-      query: options.query as Record<string, unknown> | undefined,
     });
   }
   const responseData = await response.json();
